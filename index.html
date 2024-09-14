@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Indian Trading Algorithm Dashboard 3.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --primary-color: #6C5CE7;
+            --secondary-color: #00CCFF;
+            --background-color: #0A0E17;
+            --card-color: #1C2331;
+            --text-color: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--secondary-color);
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: var(--secondary-color);
+            font-size: 1.5em;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .metric {
+            background-color: rgba(108, 92, 231, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .metric:hover {
+            background-color: rgba(108, 92, 231, 0.2);
+        }
+
+        .metric h3 {
+            margin: 0;
+            font-size: 0.9em;
+            color: var(--secondary-color);
+        }
+
+        .metric p {
+            margin: 10px 0 0;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .trade-animation {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trade-icon {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+        }
+
+        .news-ticker {
+            background-color: var(--card-color);
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .news-content {
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        #profitLossIndicator {
+            grid-column: span 3;
+            height: 50px;
+            background: linear-gradient(to right, #FF6B6B, #4ECB71);
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #profitLossMarker {
+            width: 10px;
+            height: 50px;
+            background-color: white;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Indian Trading Algorithm Dashboard 3.0</h1>
+        <div class="dashboard">
+            <div class="card full-width">
+                <h2>Real-Time SENSEX Performance</h2>
+                <div class="chart-container">
+                    <canvas id="stockChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Key Metrics</h2>
+                <div class="metrics">
+                    <div class="metric">
+                        <h3>Sharpe Ratio</h3>
+                        <p id="sharpeRatio">0.70</p>
+                    </div>
+                    <div class="metric">
+                        <h3>Volatility</h3>
+                        <p id="volatility">15.2%</p>
+                    </div>
+                    <div class="metric">
+                        <h3>RMSE</h3>
+                        <p id="rmse">2.34</p>
+                    </div>
+                    <div class="metric">
+                        <h3>Profit/Loss</h3>
+                        <p id="profitLoss">+₹12,500</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Monte Carlo Simulation</h2>
+                <div class="chart-container">
+                    <canvas id="monteCarloChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2>AI-Powered Trading Signals</h2>
+                <div class="chart-container">
+                    <canvas id="signalChart"></canvas>
+                </div>
+            </div>
+            <div class="card full-width">
+                <h2>Trading Algorithm Visualization</h2>
+                <div class="trade-animation" id="tradeAnimation"></div>
+            </div>
+            <div class="card full-width" id="profitLossIndicator">
+                <div id="profitLossMarker"></div>
+            </div>
+        </div>
+        <div class="news-ticker">
+            <div class="news-content">
+                Breaking: SENSEX hits all-time high | RBI announces new monetary policy | Tech stocks surge on AI advancements | Oil prices stabilize amid global tensions
+            </div>
+        </div>
+        <div class="controls">
+            <!-- <button class="btn" id="startAlgo">Start Algorithm</button>
+            <button class="btn" id="stopAlgo">Stop Algorithm</button>
+            <button class="btn" id="optimizeAlgo">Optimize Strategy</button> -->
+            <a href="https://colab.research.google.com/drive/1T-1vF9iU-K0S_Agdt1TN3rnyc2g_imrv?authuser=2#scrollTo=_5I9B5DPfBiQ" target="_blank" class="btn">Use Algorithm</a>
+        </div>
+    </div>
+    <script>
+        // Simulated real-time Indian stock data update
+        async function fetchIndianStockData() {
+            // Simulating SENSEX data
+            const baseValue = 60000;
+            const fluctuation = (Math.random() - 0.5) * 200;
+            return baseValue + fluctuation;
+        }
+
+        async function updateIndianStockChart(chart) {
+            try {
+                const newPrice = await fetchIndianStockData();
+                const newData = chart.data.datasets[0].data;
+                newData.push(newPrice);
+                newData.shift();
+                chart.data.labels.push(moment().format('HH:mm:ss'));
+                chart.data.labels.shift();
+                chart.update();
+            } catch (error) {
+                console.error('Error updating Indian stock data:', error);
+            }
+        }
+
+        // Stock Performance Chart
+        const stockCtx = document.getElementById('stockChart').getContext('2d');
+        const stockChart = new Chart(stockCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 100}, (_, i) => moment().subtract(100 - i, 'seconds').format('HH:mm:ss')),
+                datasets: [{
+                    label: 'SENSEX',
+                    data: Array.from({length: 100}, () => Math.random() * 1000 + 59500),
+                    borderColor: '#00CCFF',
+                    backgroundColor: 'rgba(0, 204, 255, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Monte Carlo Simulation Chart
+        const monteCarloCtx = document.getElementById('monteCarloChart').getContext('2d');
+        const monteCarloChart = new Chart(monteCarloCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => i + 1),
+                datasets: Array(50).fill().map(() => ({
+                    data: Array(30).fill().map((_, i) => i === 0 ? 60000 : 0),
+                    borderColor: `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255},0.3)`,
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    tension: 0.4
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // AI-Powered Trading Signals Chart
+        const signalCtx = document.getElementById('signalChart').getContext('2d');
+        const signalChart = new Chart(signalCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Buy Signal',
+                    data: Array.from({length: 20}, () => ({
+                        x: Math.random() * 100,
+                        y: Math.random() * 1000 + 59500
+                    })),
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    pointRadius: 6
+                },
+                {
+                    label: 'Sell Signal',
+                    data: Array.from({length: 20}, () => ({
+                        x: Math.random() * 100,
+                        y: Math.random() * 1000 + 59500
+                    })),
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    pointRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Trading Algorithm Animation
+        const tradeAnimation = document.getElementById('tradeAnimation');
+        function createTradeIcon() {
+            const icon = document.createElement('div');
+            icon.className = 'trade-icon';
+            icon.style.left = `${Math.random() * 100}%`;
+            icon.style.top = `${Math.random() * 100}%`;
+            tradeAnimation.appendChild(icon);
+
+            gsap.to(icon, {
+                duration: Math.random() * 2 + 1,
+                x: Math.random() * 400 - 200,
+                y: Math.random() * 400 - 200,
+                opacity: 0,
+                scale: 0,
+                onComplete: () => {
+                    tradeAnimation.removeChild(icon);
+                    createTradeIcon();
+                }
+            });
+        }
+
+        // Initialize trade icons
+        for (let i = 0; i < 20; i++) {
+            createTradeIcon();
+        }
+
+        // Simulated metric updates
+        function updateMetrics() {
+            document.getElementById('sharpeRatio').textContent = (Math.random() * 0.5 + 0.5).toFixed(2);
+            document.getElementById('volatility').textContent = (Math.random() * 5 + 10).toFixed(1) + '%';
+            document.getElementById('rmse').textContent = (Math.random() * 1 + 1.5).toFixed(2);
+            const profitLoss = Math.random() * 20000 - 10000;
+            document.getElementById('profitLoss').textContent = profitLoss > 0 ? `+₹${profitLoss.toFixed(0)}` : `-₹${Math.abs(profitLoss).toFixed(0)}`;
+            
+            // Update profit/loss indicator
+            const marker = document.getElementById('profitLossMarker');
+            const percentage = (profitLoss + 10000) / 20000; // Normalize to 0-1 range
+            marker.style.left = `${percentage * 100}%`;
+        }
+
+        // Start updating the metrics and stock data in intervals
+        setInterval(updateMetrics, 5000);
+        setInterval(() => updateIndianStockChart(stockChart), 3000);
+
+        // // Event listeners for button controls
+        // document.getElementById('startAlgo').addEventListener('click', () => {
+        //     alert('Starting the trading algorithm...');
+        //     // Implement algorithm start logic here
+        // });
+
+        // document.getElementById('stopAlgo').addEventListener('click', () => {
+        //     alert('Stopping the trading algorithm...');
+        //     // Implement algorithm stop logic here
+        // });
+
+        // document.getElementById('optimizeAlgo').addEventListener('click', () => {
+        //     alert('Optimizing the trading strategy...');
+        //     // Implement optimization logic here
+        // });
+    </script>
+</body>
+</html>

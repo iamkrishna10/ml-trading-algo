@@ -23,7 +23,7 @@ from sklearn.metrics import mean_squared_error
 import ipywidgets as widgets
 from IPython.display import display
 
-# Extended list of Indian stocks
+
 stock_symbols = [
     ('Reliance Industries', 'RELIANCE.NS'),
     ('Tata Consultancy Services', 'TCS.NS'),
@@ -137,7 +137,7 @@ def plot_results(analysis_results):
 
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 18))
 
-    # Plot historical prices and returns
+    
     ax1.plot(data.index, data['Close'], label='Close Price')
     ax1.set_title('Historical Stock Price')
     ax1.set_xlabel('Date')
@@ -149,13 +149,13 @@ def plot_results(analysis_results):
     ax1_twin.set_ylabel('Cumulative Return')
     ax1_twin.legend(loc='lower right')
 
-    # Plot Monte Carlo simulation
+    
     ax2.plot(monte_carlo_sim)
     ax2.set_title('Monte Carlo Simulation')
     ax2.set_xlabel('Days')
     ax2.set_ylabel('Simulated Price')
 
-    # Plot ARIMA forecast
+    
     ax3.plot(data.index[-100:], data['Close'].tail(100), label='Historical')
     ax3.plot(pd.date_range(start=data.index[-1], periods=31)[1:], arima_forecast, label='ARIMA Forecast')
     ax3.set_title('ARIMA Forecast')
@@ -201,7 +201,7 @@ def on_analyze_button_clicked(b):
         else:
             print("Analysis failed. Please check your inputs and try again.")
 
-# UI setup
+
 dropdown = widgets.Dropdown(
     options=stock_symbols,
     description='Select Stock:',

@@ -26,7 +26,6 @@ from IPython.display import display
 
 stock_symbols = [
     ('Reliance Industries', 'RELIANCE.NS'),
-    ('Tata Consultancy Services', 'TCS.NS'),
     ('HDFC Bank', 'HDFCBANK.NS'),
     ('Infosys', 'INFY.NS'),
     ('ICICI Bank', 'ICICIBANK.NS'),
